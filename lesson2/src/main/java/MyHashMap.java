@@ -13,7 +13,7 @@ public class MyHashMap<K, V> implements Map<K, V> {
         this.capacity = INITIAL_CAPACITY;
         this.size = 0;
     }
-    
+
     public MyHashMap(int capacity) {
         this.arr = new MyNode[capacity];
         this.capacity = capacity;
@@ -86,8 +86,6 @@ public class MyHashMap<K, V> implements Map<K, V> {
             return Objects.hash(key, value);
         }
     }
-
-    //  class MyLinkedList implements List
 
     public int size() {
         return this.size;

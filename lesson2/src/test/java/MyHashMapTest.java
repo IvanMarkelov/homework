@@ -2,6 +2,7 @@ import org.junit.*;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.*;
+
 import java.util.*;
 
 class MyHashMapTest {
@@ -31,8 +32,8 @@ class MyHashMapTest {
     void containsKey() {
         assertTrue(myHashMap.containsKey("Doah"));
         assertTrue(myHashMap.containsKey("Woah"));
-      //  myHashMap.remove("Woah");
-       // assertFalse(myHashMap.containsKey("Woah"));
+        //  myHashMap.remove("Woah");
+        // assertFalse(myHashMap.containsKey("Woah"));
     }
 
     @org.junit.jupiter.api.Test
@@ -112,7 +113,7 @@ class MyHashMapTest {
     @org.junit.jupiter.api.Test
     void put_throwsExceptionWhenKeyIsUsed() {
         assertThrows(IllegalArgumentException.class, () ->
-            myHashMap.put("Woah", "Road"));
+                myHashMap.put("Woah", "Road"));
     }
 
     @org.junit.jupiter.api.Test
