@@ -19,6 +19,7 @@ class SortingTest {
 
     @org.junit.jupiter.api.Test
     public void test() {
+        peopleData = new PeopleData(10000);
         for (Person p : peopleData.getArray()) {
             System.out.println(p.toString());
         }
@@ -47,19 +48,31 @@ class SortingTest {
         for (Person p : sortedArr) {
             System.out.println(p.toString());
         }
-        System.out.println(duration);
         System.out.println();
 
         for (Person p : sortedArr2) {
             System.out.println(p.toString());
         }
-        System.out.println(duration2);
         System.out.println();
 
         for (Person p : sortedArr3) {
             System.out.println(p.toString());
         }
-        System.out.println(duration3);
+
+        int numberOfMistakes = 0;
+
+        for (int i = 0; i < peopleData.getArray().length; i++) {
+            if (!sortedArr[i].equals(sortedArr2[i]) || !sortedArr2[i].equals(sortedArr3[i])) {
+                numberOfMistakes++;
+            }
+        }
+
+        System.out.println("Number of differences in sorted values " +
+                "between three arrays, sorted by 3 different methods: " + numberOfMistakes);
+
+        System.out.println("Bubble sorting of 10000 people took " + (duration/1000000) + " milliseconds.");
+        System.out.println("Selection sorting of 10000 people took " + (duration2/1000000) + " milliseconds.");
+        System.out.println("Java stream sorting of 10000 people took " + (duration3/1000000) + " milliseconds.");
     }
 
     @org.junit.jupiter.api.Test
