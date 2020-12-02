@@ -1,23 +1,10 @@
+import java.util.Comparator;
 import java.util.Objects;
 
 public class Person {
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Person person = (Person) o;
-        return age == person.age &&
-                sex == person.sex &&
-                name.equals(person.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(age, name);
-    }
-
     public enum Sex {
-        MAN, WOMAN
+        MAN,
+        WOMAN
     }
 
     private int age;
@@ -50,5 +37,15 @@ public class Person {
         return this.getAge() + " years old "
                 + this.getName() + ", "
                 + this.getSex();
+    }
+
+    public int sexComparator(Person person) {
+        if (this.getSex() == Sex.MAN && person.getSex() == Sex.WOMAN) {
+            return 1;
+        } else if (this.getSex() == Sex.WOMAN && person.getSex() == Sex.MAN) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 }

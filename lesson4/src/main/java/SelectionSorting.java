@@ -3,15 +3,18 @@ import java.util.Collection;
 public class SelectionSorting implements Sorting {
 
     public Person[] sortPeople(Person[] peopleToSort) {
+        if (peopleToSort.length < 2) {
+            return peopleToSort;
+        }
 
         for (int i = 0; i < peopleToSort.length; i++) {
             Person minimal = peopleToSort[i];
-            int indexOfMin = 0;
+            int indexOfMin = i;
             for (int j = i + 1; j < peopleToSort.length; j++) {
-                if (minimal.getSex().hashCode() > peopleToSort[j].getSex().hashCode()) {
+                if (minimal.sexComparator(peopleToSort[j]) < 0) {
                     minimal = peopleToSort[j];
                     indexOfMin = j;
-                } else if (minimal.getSex().hashCode() == peopleToSort[j].getSex().hashCode()) {
+                } else if (minimal.sexComparator(peopleToSort[j]) == 0) {
                     if (minimal.getAge() < peopleToSort[j].getAge()) {
                         minimal = peopleToSort[j];
                         indexOfMin = j;

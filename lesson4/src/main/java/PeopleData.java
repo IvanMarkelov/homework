@@ -8,11 +8,28 @@ public class PeopleData {
 
     public PeopleData(int numberOfPeople) {
         this.rd = new Random();
-        this.arr = generatePeople(numberOfPeople);
+        if (numberOfPeople > 0) {
+            this.arr = generatePeople(numberOfPeople);
+        } else {
+            throw new IllegalArgumentException("The array has to have more than one person.");
+        }
+    }
+
+    public PeopleData(Person[] listOfPeople) {
+        this.rd = new Random();
+        if (listOfPeople.length > 0) {
+            this.arr = listOfPeople;
+        } else {
+            throw new IllegalArgumentException("The array has to have more than one person.");
+        }
     }
 
     public Person[] getArray() {
         return arr;
+    }
+
+    public void setArr(Person[] newArr) {
+        this.arr = newArr;
     }
 
     public boolean containsPerson(Person personToCheck) {
@@ -27,8 +44,9 @@ public class PeopleData {
 
     public void addPerson(Person person) {
         if (!containsPerson(person)) {
-            Person[] copy = Arrays.copyOf(arr, arr.length+1);
+            Person[] copy = Arrays.copyOf(arr, arr.length + 1);
             copy[arr.length] = person;
+            this.arr = copy;
         } else {
             throw new IllegalArgumentException("This person already exists in the list!");
         }
@@ -58,8 +76,8 @@ public class PeopleData {
         int leftLimit = 97;
         int rightLimit = 122;
         StringBuilder sb = new StringBuilder();
-        int nameLength = rd.nextInt(35)+10;
-        int spaceIndex = rd.nextInt(nameLength-5)+2;
+        int nameLength = rd.nextInt(35) + 10;
+        int spaceIndex = rd.nextInt(nameLength - 5) + 2;
         for (int i = 0; i < nameLength; i++) {
             if (i != spaceIndex) {
                 int randomLimitedInt =
