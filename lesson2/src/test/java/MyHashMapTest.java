@@ -1,13 +1,13 @@
-import org.junit.*;
-import org.junit.jupiter.api.Test;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
-import java.util.*;
-
 class MyHashMapTest {
 
-    private MyHashMap myHashMap;
+    private MyHashMap<String, String> myHashMap;
 
     @org.junit.jupiter.api.BeforeEach
     public void setUp() {
@@ -32,8 +32,6 @@ class MyHashMapTest {
     void containsKey() {
         assertTrue(myHashMap.containsKey("Doah"));
         assertTrue(myHashMap.containsKey("Woah"));
-        //  myHashMap.remove("Woah");
-        // assertFalse(myHashMap.containsKey("Woah"));
     }
 
     @org.junit.jupiter.api.Test
@@ -43,7 +41,7 @@ class MyHashMapTest {
 
     @org.junit.jupiter.api.Test
     void get() {
-        String myNodeValue = (String) myHashMap.get("Woah");
+        String myNodeValue = myHashMap.get("Woah");
         assertEquals("It works.", myNodeValue);
     }
 
@@ -67,7 +65,7 @@ class MyHashMapTest {
         newHashMap.put("Broah", "Something.");
         myHashMap.putAll(newHashMap);
         assertEquals(3, myHashMap.size());
-        String myNodeValue = (String) myHashMap.get("Woah");
+        String myNodeValue = myHashMap.get("Woah");
         assertEquals("Nope.", myNodeValue);
     }
 
@@ -79,26 +77,26 @@ class MyHashMapTest {
 
     @org.junit.jupiter.api.Test
     void keySet() {
-        Set newSet = myHashMap.keySet();
+        Set<String> newSet = myHashMap.keySet();
         assertEquals(2, newSet.size());
     }
 
     @org.junit.jupiter.api.Test
     void values() {
-        Collection values = myHashMap.values();
+        Collection<String> values = myHashMap.values();
         assertEquals(2, values.size());
     }
 
     @org.junit.jupiter.api.Test
     void entrySet() {
-        Set newSet = myHashMap.entrySet();
+        Set<Map.Entry<String, String>> newSet = myHashMap.entrySet();
         assertEquals(2, newSet.size());
     }
 
     @org.junit.jupiter.api.Test
     void replaceMyNode() {
         myHashMap.replaceMyNode("Woah", "NewDay");
-        String myNodeValue = (String) myHashMap.get("Woah");
+        String myNodeValue = myHashMap.get("Woah");
         assertEquals("NewDay", myNodeValue);
     }
 
@@ -106,7 +104,7 @@ class MyHashMapTest {
     void increaseCapacity() {
         myHashMap.increaseCapacity();
         assertEquals(32, myHashMap.getCapacity());
-        String myNodeValue = (String) myHashMap.get("Woah");
+        String myNodeValue = myHashMap.get("Woah");
         assertEquals("It works.", myNodeValue);
     }
 
@@ -128,5 +126,21 @@ class MyHashMapTest {
     void remove_throwsExceptionIfKeyIsNull() {
         assertThrows(NullPointerException.class, () ->
                 myHashMap.replaceMyNode(null, "Road"));
+    }
+
+    @org.junit.jupiter.api.Test
+    void containsValue_newStringInstance() {
+        Map<String, String> map = new HashMap<>();
+        map.put("1", "TEST");
+
+        assertTrue(map.containsValue(new String("TEST")));
+        assertTrue(myHashMap.containsValue(new String("It works.")));
+    }
+
+    @org.junit.jupiter.api.Test
+    void get_newStringInstance() {
+        String myNodeValue = myHashMap.get(new String("Woah"));
+
+        assertEquals("It works.", myNodeValue);
     }
 }

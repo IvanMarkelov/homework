@@ -20,20 +20,8 @@ public class MyHashMap<K, V> implements Map<K, V> {
         this.size = 0;
     }
 
-    public MyNode[] getArr() {
-        return arr;
-    }
-
-    public void setArr(MyNode[] arr) {
-        this.arr = arr;
-    }
-
     public int getCapacity() {
         return capacity;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
     }
 
     class MyNode<K, V> implements Map.Entry<K, V> {
@@ -103,7 +91,7 @@ public class MyHashMap<K, V> implements Map<K, V> {
         if (this.arr != null && this.size > 0) {
             for (MyNode myNode : this.arr) {
                 if (myNode != null) {
-                    if (myNode.getValue() != value) {
+                    if (myNode.getValue().equals(value)) {
                         MyNode tempNode = myNode;
                         while (tempNode.nextNode != null) {
                             if (tempNode.getKey() == value) {
@@ -125,7 +113,7 @@ public class MyHashMap<K, V> implements Map<K, V> {
         if (this.arr[hash] == null) {
             return null;
         }
-        if (this.arr[hash].getKey() != key) {
+        if (!this.arr[hash].getKey().equals(key)) {
             MyNode tempNode = this.arr[hash];
             while (tempNode.nextNode != null) {
                 if (tempNode.getKey() == key) {
@@ -265,11 +253,11 @@ public class MyHashMap<K, V> implements Map<K, V> {
         return set;
     }
 
-    public int getIndex(Object key, int capacity) {
+    private int getIndex(Object key, int capacity) {
         return key.hashCode() % capacity;
     }
 
-    public Collection importHashMapToCollection() {
+    private Collection importHashMapToCollection() {
         Collection<V> collection = new ArrayList<>();
         if (this.arr != null && this.size > 0) {
             for (int i = 0; i < this.arr.length; i++) {
@@ -287,7 +275,7 @@ public class MyHashMap<K, V> implements Map<K, V> {
         return collection;
     }
 
-    public boolean checkIfFull() {
+    private boolean checkIfFull() {
         float currentLoadFactor = (float) this.size / this.capacity;
         return currentLoadFactor >= LOAD_FACTOR;
     }
@@ -310,7 +298,7 @@ public class MyHashMap<K, V> implements Map<K, V> {
         }
     }
 
-    public void updateIfFull() {
+    private void updateIfFull() {
         if (checkIfFull()) {
             increaseCapacity();
         }
