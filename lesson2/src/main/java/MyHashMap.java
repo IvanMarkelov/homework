@@ -4,7 +4,7 @@ public class MyHashMap<K, V> implements Map<K, V> {
 
     private final int INITIAL_CAPACITY = 16;
     private final float LOAD_FACTOR = 0.75F;
-    private MyNode[] arr;
+    private MyNode<K, V>[] arr;
     private int capacity;
     private int size;
 
@@ -52,11 +52,11 @@ public class MyHashMap<K, V> implements Map<K, V> {
             return value;
         }
 
-        public void setNextNode(MyNode node) {
+        public void setNextNode(MyNode<K, V> node) {
             this.nextNode = node;
         }
 
-        public MyNode getNextNode() {
+        public MyNode<K, V> getNextNode() {
             return this.nextNode;
         }
 
@@ -89,12 +89,13 @@ public class MyHashMap<K, V> implements Map<K, V> {
 
     public boolean containsValue(Object value) {
         if (this.arr != null && this.size > 0) {
-            for (MyNode myNode : this.arr) {
+            for (MyNode<K, V> myNode : this.arr) {
                 if (myNode != null) {
-                    if (myNode.getValue().equals(value)) {
-                        MyNode tempNode = myNode;
+                    if (myNode.value.equals(value)) {
+                        MyNode<K, V> tempNode = myNode;
                         while (tempNode.nextNode != null) {
-                            if (tempNode.getKey() == value) {
+                            //strange behavior if (tempNode.key == value) {
+                            if (tempNode.value.equals(value)) {
                                 return true;
                             }
                             tempNode = tempNode.nextNode;
@@ -113,31 +114,39 @@ public class MyHashMap<K, V> implements Map<K, V> {
         if (this.arr[hash] == null) {
             return null;
         }
-        if (!this.arr[hash].getKey().equals(key)) {
-            MyNode tempNode = this.arr[hash];
+        if (hash == 0) {
+            return this.arr[hash].value;
+        }
+        if (!this.arr[hash].key.equals(key)) {
+            MyNode<K, V> tempNode = this.arr[hash];
             while (tempNode.nextNode != null) {
-                if (tempNode.getKey() == key) {
-                    return (V) tempNode.getValue();
+                if (tempNode.key.equals(key)) {
+                    return tempNode.value;
                 }
                 tempNode = tempNode.nextNode;
             }
             return null;
         } else {
-            return (V) this.arr[hash].getValue();
+            return this.arr[hash].value;
         }
     }
 
-    public V replaceMyNode(K key, V value) {
+    public V replace(K key, V value) {
         int hash = getIndex(key, this.capacity);
         V oldValue;
-        if (this.arr[hash] == null || key == null) {
+        if (this.arr[hash] == null) {
             throw new NullPointerException("The node with such key doesn't exist!");
         }
-        if (this.arr[hash].getKey() != key) {
-            MyNode tempNode = this.arr[hash];
+        if (hash == 0) {
+            oldValue = this.arr[hash].value;
+            this.arr[hash].value = value;
+            return oldValue;
+        }
+        if (!this.arr[hash].key.equals(key)) {
+            MyNode<K, V> tempNode = this.arr[hash];
             while (tempNode.nextNode != null) {
-                if (tempNode.getKey() == key) {
-                    oldValue = (V) tempNode.getValue();
+                if (tempNode.key.equals(key)) {
+                    oldValue = tempNode.value;
                     tempNode.setValue(value);
                     return oldValue;
                 }
@@ -145,7 +154,7 @@ public class MyHashMap<K, V> implements Map<K, V> {
             }
             throw new NullPointerException("The node with such key doesn't exist!");
         } else {
-            oldValue = (V) this.arr[hash];
+            oldValue = this.arr[hash].value;
             this.arr[hash].setValue(value);
             return oldValue;
         }
@@ -154,12 +163,14 @@ public class MyHashMap<K, V> implements Map<K, V> {
     public V put(K key, V value) {
         updateIfFull();
         if (this.containsKey(key)) {
-            throw new IllegalArgumentException("This key already exists!");
+            V oldVal = get(key);
+            this.replace(key, value);
+            return oldVal;
         }
-        MyNode newNode = new MyNode(key, value);
-        int hash = getIndex(newNode.getKey(), this.capacity);
+        MyNode<K, V> newNode = new MyNode<>(key, value);
+        int hash = getIndex(newNode.key, this.capacity);
         if (this.arr[hash] != null) {
-            MyNode tempNode = this.arr[hash];
+            MyNode<K, V> tempNode = this.arr[hash];
             while (tempNode.nextNode != null) {
                 tempNode = tempNode.nextNode;
             }
@@ -168,30 +179,44 @@ public class MyHashMap<K, V> implements Map<K, V> {
             this.arr[hash] = newNode;
         }
         size++;
-        return (V) newNode.getValue();
+        return null;
+    }
+
+    private void testMethod() {
+           Map<Integer, Integer> d = new HashMap<>();
+           d.put(12, 34);
+           d.remove(12);
+           d.putAll(d);
+           d.remove(2);
     }
 
     public V remove(Object key) {
-        if (key == null) {
-            throw new NullPointerException("The key cannot be null!");
-        }
         int hash = getIndex(key, this.capacity);
-        MyNode nodeToRemove;
-        MyNode currentNode = this.arr[hash];
+        if (key == null) {
+            if (this.arr[hash] == null) {
+                return null;
+            } else {
+                V oldVal = get(key);
+                this.arr[0] = null;
+                return oldVal;
+            }
+        }
+        MyNode<K, V> nodeToRemove;
+        MyNode<K, V> currentNode = this.arr[hash];
         while (currentNode != null) {
-            if (currentNode.getKey() == key) {
+            if (currentNode.key.equals(key)) {
                 nodeToRemove = currentNode;
                 this.arr[hash] = currentNode.getNextNode();
                 this.size--;
-                return (V) nodeToRemove;
+                return nodeToRemove.value;
             }
             if (currentNode.getNextNode() != null) {
-                if (currentNode.getNextNode().getKey() == key) {
+                if (currentNode.getNextNode().key.equals(key)) {
                     nodeToRemove = currentNode.getNextNode();
-                    MyNode newNextNode = currentNode.getNextNode().getNextNode();
+                    MyNode<K, V> newNextNode = currentNode.getNextNode().getNextNode();
                     currentNode.setNextNode(newNextNode);
                     this.size--;
-                    return (V) nodeToRemove;
+                    return nodeToRemove.value;
                 } else {
                     currentNode = currentNode.getNextNode();
                 }
@@ -201,19 +226,14 @@ public class MyHashMap<K, V> implements Map<K, V> {
     }
 
     public void putAll(Map<? extends K, ? extends V> map) {
-        MyHashMap myMap = (MyHashMap) map;
+        MyHashMap<K, V> myMap = (MyHashMap<K, V>) map;
         if (myMap.arr != null && myMap.size > 0) {
             for (int i = 0; i < myMap.arr.length; i++) {
                 if (myMap.arr[i] != null) {
-                    MyNode currentNode = myMap.arr[i];
+                    MyNode<K, V> currentNode = myMap.arr[i];
                     while (currentNode != null) {
-                        if (this.containsKey(currentNode.getKey())) {
-                            this.replaceMyNode((K) currentNode.getKey(),
-                                    (V) currentNode.getValue());
-                        } else {
-                            this.put((K) currentNode.getKey(),
-                                    (V) currentNode.getValue());
-                        }
+                        this.put(currentNode.key,
+                                    currentNode.value);
                         currentNode = currentNode.getNextNode();
                     }
                 }
@@ -228,45 +248,53 @@ public class MyHashMap<K, V> implements Map<K, V> {
 
     public Set<K> keySet() {
         Set<K> set = new HashSet<>();
-        Collection<MyNode> fullCollection = this.importHashMapToCollection();
-        for (MyNode node : fullCollection) {
-            set.add((K) node.getKey());
+        Collection<MyNode<K, V>> fullCollection = this.importHashMapToCollection();
+        for (MyNode<K, V> node : fullCollection) {
+            set.add(node.key);
         }
         return set;
     }
 
     public Collection values() {
         Collection<V> collection = new ArrayList<>();
-        Collection<MyNode> fullCollection = this.importHashMapToCollection();
-        for (MyNode node : fullCollection) {
-            collection.add((V) node.getValue());
+        Collection<MyNode<K, V>> fullCollection = this.importHashMapToCollection();
+        for (MyNode<K, V> node : fullCollection) {
+            collection.add(node.value);
         }
         return collection;
     }
 
     public Set<Entry<K, V>> entrySet() {
         Set<Entry<K, V>> set = new HashSet<>();
-        Collection<MyNode> fullCollection = this.importHashMapToCollection();
-        for (MyNode node : fullCollection) {
+        Collection<MyNode<K, V>> fullCollection = this.importHashMapToCollection();
+        for (MyNode<K, V> node : fullCollection) {
             set.add(node);
         }
         return set;
     }
 
     private int getIndex(Object key, int capacity) {
-        return key.hashCode() % capacity;
+        int index = 0;
+        if (key == null) {
+            return index;
+        }
+        index = key.hashCode() % capacity;
+        if (index == 0) {
+            index = (key.hashCode() + 1) % capacity;
+        }
+        return index;
     }
 
-    private Collection importHashMapToCollection() {
-        Collection<V> collection = new ArrayList<>();
+    private Collection<MyNode<K, V>> importHashMapToCollection() {
+        Collection<MyNode<K, V>> collection = new ArrayList<>();
         if (this.arr != null && this.size > 0) {
-            for (int i = 0; i < this.arr.length; i++) {
-                if (this.arr[i] != null) {
-                    MyNode currentNode = this.arr[i];
+            for (MyNode<K, V> node : this.arr) {
+                if (node != null) {
+                    MyNode<K, V> currentNode = node;
                     while (currentNode != null) {
-                        MyNode tempNode = currentNode;
+                        MyNode<K, V> tempNode = currentNode;
                         tempNode.setNextNode(null);
-                        collection.add((V) tempNode);
+                        collection.add(tempNode);
                         currentNode = currentNode.getNextNode();
                     }
                 }
@@ -281,19 +309,19 @@ public class MyHashMap<K, V> implements Map<K, V> {
     }
 
     public void increaseCapacity() {
-        MyHashMap<K, V> newMap = new MyHashMap<K, V>(this.capacity * 2);
+        MyHashMap<K, V> newMap = new MyHashMap<>(this.capacity * 2);
         if (this.arr != null && this.size > 0) {
-            for (int i = 0; i < this.arr.length; i++) {
-                if (this.arr[i] != null) {
-                    MyNode tempNode = this.arr[i];
+            for (MyNode<K, V> kvMyNode : this.arr) {
+                if (kvMyNode != null) {
+                    MyNode<K, V> tempNode = kvMyNode;
                     while (tempNode != null) {
-                        newMap.put((K) tempNode.getKey(), (V) tempNode.getValue());
+                        newMap.put(tempNode.key, tempNode.value);
                         tempNode = tempNode.getNextNode();
                     }
                 }
             }
             this.arr = newMap.arr;
-            this.size = newMap.size();
+            this.size = newMap.size;
             this.capacity = newMap.capacity;
         }
     }

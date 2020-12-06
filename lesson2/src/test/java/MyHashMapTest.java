@@ -37,6 +37,7 @@ class MyHashMapTest {
     @org.junit.jupiter.api.Test
     void containsValue() {
         assertTrue(myHashMap.containsValue("It works."));
+        assertTrue(myHashMap.containsValue(new String("It still works.")));
     }
 
     @org.junit.jupiter.api.Test
@@ -95,7 +96,7 @@ class MyHashMapTest {
 
     @org.junit.jupiter.api.Test
     void replaceMyNode() {
-        myHashMap.replaceMyNode("Woah", "NewDay");
+        myHashMap.replace("Woah", "NewDay");
         String myNodeValue = myHashMap.get("Woah");
         assertEquals("NewDay", myNodeValue);
     }
@@ -109,23 +110,31 @@ class MyHashMapTest {
     }
 
     @org.junit.jupiter.api.Test
-    void put_throwsExceptionWhenKeyIsUsed() {
-        assertThrows(IllegalArgumentException.class, () ->
-                myHashMap.put("Woah", "Road"));
+    void put_WhenKeyAlreadyExist() {
+        myHashMap.put("Woah", "Road");
+        assertEquals("Road", myHashMap.get("Woah"));
+    }
+
+    @org.junit.jupiter.api.Test
+    void put_WhenKeyIsNull() {
+        MyHashMap<String, String> test = new MyHashMap<>();
+        String zer = "zer";
+        test.put(null, zer);
+        assertEquals(zer, test.get(null));
     }
 
     @org.junit.jupiter.api.Test
     void replaceMyNode_throwsExceptionIfKeyIsNotFoundOrNull() {
         assertThrows(NullPointerException.class, () ->
-                myHashMap.replaceMyNode("Boar", "Road"));
+                myHashMap.replace("Boar", "Road"));
         assertThrows(NullPointerException.class, () ->
-                myHashMap.replaceMyNode(null, "Road"));
+                myHashMap.replace(null, "Road"));
     }
 
     @org.junit.jupiter.api.Test
     void remove_throwsExceptionIfKeyIsNull() {
         assertThrows(NullPointerException.class, () ->
-                myHashMap.replaceMyNode(null, "Road"));
+                myHashMap.replace(null, "Road"));
     }
 
     @org.junit.jupiter.api.Test
