@@ -30,31 +30,28 @@ public class Main {
         StringBuilder sb = new StringBuilder();
         Class<?> class_ = object.getClass();
 
-        Object objectClone = object;
+        Set<String> bothFields = new HashSet<>();
+        bothFields.addAll(fieldsToCleanup);
+        bothFields.addAll(fieldsToOutput);
 
         if (Map.class.isAssignableFrom(class_)) {
-            Class[] cArg = new Class[1];
+            Map<?, ?> map = (Map<?, ?>) object;
+            Class<?>[] cArg = new Class[1];
             cArg[0] = Object.class;
 
-            Method containsMapKey = class_.getMethod("containsKey", cArg);
             Method removeByKey = class_.getMethod("remove", cArg);
             Method getByKey = class_.getMethod("get", cArg);
 
+            containsFields(map.keySet(), bothFields);
+
             for (String s : fieldsToCleanup) {
-                if ((boolean) containsMapKey.invoke(objectClone, s)) {
-                    removeByKey.invoke(objectClone, s);
-                } else {
-                    throw new IllegalArgumentException("The object doesn't contain this field/key: " + s);
-                }
+                removeByKey.invoke(object, s);
             }
             for (String s : fieldsToOutput) {
-                if ((boolean) containsMapKey.invoke(objectClone, s)) {
-                    sb.append(getByKey.invoke(objectClone, s));
-                    sb.append("\n");
-                } else {
-                    throw new IllegalArgumentException("The object doesn't contain this field/key: " + s);
-                }
+                sb.append(getByKey.invoke(object, s));
+                sb.append("\n");
             }
+
         } else {
             Field[] declaredFields = class_.getDeclaredFields();
             Set<String> fieldNames = new HashSet<>();
@@ -62,34 +59,33 @@ public class Main {
                 fieldNames.add(f.getName());
             }
 
-            Set<String> bothFields = new HashSet<>();
-            bothFields.addAll(fieldsToCleanup);
-            bothFields.addAll(fieldsToOutput);
-
-            for (String s : bothFields) {
-                if (!fieldNames.contains(s)) {
-                    throw new IllegalArgumentException("The object doesn't contain this field/key: " + s);
-                }
-            }
+            containsFields(fieldNames, bothFields);
 
             for (Field f : declaredFields) {
                 if (fieldsToCleanup.contains(f.getName())) {
                     if (f.getType().isPrimitive()) {
                         if (f.getType() == Boolean.TYPE) {
-                            f.set(objectClone, false);
+                            f.set(object, false);
                         } else {
-                            f.set(objectClone, 0);
+                            f.set(object, 0);
                         }
                     } else {
-                        f.set(objectClone, null);
+                        f.set(object, null);
                     }
                 } else if (fieldsToOutput.contains(f.getName())) {
-                    sb.append(f.get(objectClone));
+                    sb.append(f.get(object));
                     sb.append("\n");
                 }
             }
         }
-        object = objectClone;
         System.out.println(sb.toString());
+    }
+
+    private static void containsFields(Set<?> objectFieldNames, Set<String> bothFields) {
+        for (String s : bothFields) {
+            if (!objectFieldNames.contains(s)) {
+                throw new IllegalArgumentException("The object doesn't contain this field/key: " + s);
+            }
+        }
     }
 }
