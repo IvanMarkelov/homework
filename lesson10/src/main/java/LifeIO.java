@@ -1,40 +1,34 @@
 import java.io.*;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.StringJoiner;
 
 public class LifeIO {
-    public boolean[][] dataParsed;
 
-    public LifeIO(String filepath) {
-        dataParsed = parseInput(filepath);
-    }
-
-    private boolean[][] parseInput(String filepath) {
+    public boolean[][] lifeReader(String filepath) {
         int numberOfRows = 0;
         int numberOfCols = 0;
+        ArrayList<boolean[]> arrField = new ArrayList<>();
         String line;
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(filepath));
             while ((line = bufferedReader.readLine()) != null) {
                 if (numberOfRows == 0) {
-                    bufferedReader.mark(1000);
+                    numberOfCols = line.split(", ").length;
                 }
-                numberOfRows++;
-                numberOfCols = line.split(", ").length;
-            }
-            bufferedReader.reset();
-
-            boolean[][] field = new boolean[numberOfRows][numberOfCols];
-
-            int index = 0;
-            while ((line = bufferedReader.readLine()) != null) {
+                boolean[] row = new boolean[numberOfCols];
                 for (int i = 0; i < numberOfCols; i++) {
-                    field[index][i] = line.split(", ")[i].equals("true");
+                    row[i] = Boolean.parseBoolean(line.split(", ")[i]);
                 }
-                index++;
+                arrField.add(row);
+                numberOfRows++;
             }
             bufferedReader.close();
 
+            boolean[][] field = new boolean[numberOfRows][numberOfCols];
+            for (int i = 0; i < numberOfRows; i++) {
+                field[i] = arrField.get(i);
+            }
             return field;
 
         } catch (IOException e) {
@@ -43,13 +37,13 @@ public class LifeIO {
         throw new InputMismatchException("Format of the file is invalid.");
     }
 
-    public void writeLifeField(boolean[][] field, String filename) {
+    public void lifeWriter(boolean[][] field, String filename) {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filename));
-            for (int i = 0; i < field.length; i++) {
+            for (boolean[] booleans : field) {
                 StringJoiner joiner = new StringJoiner(", ");
                 for (int j = 0; j < field[1].length; j++) {
-                    joiner.add(Boolean.toString(field[i][j]));
+                    joiner.add(Boolean.toString(booleans[j]));
                 }
                 bufferedWriter.write(joiner.toString());
                 bufferedWriter.newLine();
@@ -60,15 +54,36 @@ public class LifeIO {
         }
     }
 
-    public void printLifeField() {
-        for (int i = 0; i < dataParsed.length; i++) {
-            for (int j = 0; j < dataParsed[1].length; j++) {
+    public void lifeConsolePrinter(boolean[][] field) {
+        for (boolean[] booleans : field) {
+            for (int j = 0; j < field[1].length; j++) {
                 char toPrint;
-                toPrint = dataParsed[i][j] ? 'X' : 'O';
+                toPrint = booleans[j] ? 'X' : 'O';
                 System.out.print(toPrint + " ");
             }
             System.out.println();
         }
         System.out.println();
+    }
+
+    public boolean[][] lifeFieldGenerator(int rows, int columns) {
+        boolean[][] field = new boolean[rows][columns];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                field[i][j] = Math.random() > 0.7;
+            }
+        }
+        return field;
+    }
+
+    public boolean compareFields(boolean[][] fieldOneThread, boolean[][] fieldMultiThread) {
+        for (int i = 0; i < fieldOneThread.length; i++) {
+            for (int j = 0; j < fieldOneThread[1].length; j++) {
+                if (fieldOneThread[i][j] != fieldMultiThread[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

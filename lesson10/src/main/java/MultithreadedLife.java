@@ -4,21 +4,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class MultithreadedLife implements ILife {
-    public LifeIO lifeIO;
     public static boolean[][] field;
     public int numberOfThreads;
 
-    public int getNumberOfThreads() {
-        return numberOfThreads;
-    }
-
-    public void setNumberOfThreads(int numberOfThreads) {
-        this.numberOfThreads = numberOfThreads;
-    }
-
-    public MultithreadedLife(LifeIO lifeIO, int numberOfThreads) {
-        this.lifeIO = lifeIO;
-        field = lifeIO.dataParsed;
+    public MultithreadedLife(boolean[][] fieldToSimulate, int numberOfThreads) {
+        field = fieldToSimulate;
         this.numberOfThreads = numberOfThreads;
     }
 
@@ -54,7 +44,6 @@ public class MultithreadedLife implements ILife {
                     calculateNextGeneration(start, threadsCount, (boolean[][]) tempField);
                 });
             }
-
             Arrays.stream(threads).forEach(Thread::start);
             Arrays.stream(threads).forEach(t -> {
                 try {

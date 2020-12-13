@@ -1,10 +1,10 @@
+
+
 public class Life implements ILife {
-    public LifeIO lifeIO;
     public boolean[][] field;
 
-    public Life(LifeIO lifeIO) {
-        this.lifeIO = lifeIO;
-        this.field = lifeIO.dataParsed;
+    public Life(boolean[][] field) {
+        this.field = field;
     }
 
     public boolean[][] simulateLife(int numberOfCycles) {
