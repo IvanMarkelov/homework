@@ -1,0 +1,9 @@
+version: "3.0"
+services:
+  dserv:
+    build:
+      .
+    ports:
+      - "8080:8080"
+    volumes:
+    - ./lesson18/src/main/resources/404.html:/lesson18/src/main/resources/404.html
